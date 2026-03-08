@@ -71,6 +71,10 @@ FYSS is not distributed on the App Store. Don't do that. You build and install i
 3. Select the **FYSS** target → **Signing & Capabilities** → choose your personal team
 4. Connect your device and press **⌘R**
 
+## License
+
+Public domain. Do whatever you want with it. See [LICENSE](LICENSE) for the legalese ([The Unlicense](https://unlicense.org)).
+
 ## URL schemes registered
 
 | Scheme   | Purpose                                              |
