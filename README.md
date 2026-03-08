@@ -68,7 +68,9 @@ FYSS is not distributed on the App Store. Don't do that. You build and install i
 
 1. Clone or download this repository
 2. Open `FYSS.xcodeproj` in Xcode
-3. Select the **FYSS** target → **Signing & Capabilities** → choose your personal team
+3. Select the **FYSS** target → **Signing & Capabilities**:
+   - Set **Team** to your personal Apple Developer account
+   - Change **Bundle Identifier** from `com.yourteam.FYSS` to something unique (e.g. `com.yourname.FYSS`)
 4. Connect your device and press **⌘R**
 
 ## License
