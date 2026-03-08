@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Xcode user-specific data (schemes, breakpoints, window state, personal settings)
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+
+# Xcode build output
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
