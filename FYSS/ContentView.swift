@@ -21,7 +21,7 @@ struct ContentView: View {
 
     /// The base URL to which the extracted YouTube link is appended before opening.
     /// Persisted via `UserDefaults` under the key `targetURL`.
-    @AppStorage("targetURL") private var targetURL: String = "unwatched://queue?url="
+    @AppStorage("targetURL") private var targetURL: String = "unwatched://queue?url={url}"
 
     /// When true, the forwarding URL is constructed using Shortcuts' x-callback-url scheme
     /// so that the Shortcuts app reopens YouTube after the shortcut completes.
@@ -88,7 +88,7 @@ struct ContentView: View {
                 Section {
                     // axis: .vertical allows the field to grow to multiple lines on narrow screens.
                     TextField(
-                        "e.g. unwatched://queue?url=",
+                        "e.g. unwatched://queue?url={url}",
                         text: $targetURL,
                         axis: .vertical
                     )
@@ -103,11 +103,16 @@ struct ContentView: View {
                 } header: {
                     Label("Target URL", systemImage: "arrow.turn.up.right")
                 } footer: {
-                    Button {
-                        showUnwatchedSheet = true
-                    } label: {
-                        Text("Show me how to use FYSS with Unwatched")
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Use **{url}** as a placeholder for the video link. Any text after it becomes extra parameters (e.g. unwatched://queue?url={url}&next=true). Without the placeholder, the link is appended at the end.")
                             .font(.footnote)
+                        Button {
+                            showUnwatchedSheet = true
+                        } label: {
+                            Text("Show me how to use FYSS with Unwatched")
+                                .font(.footnote)
+                        }
+                        .padding(.top, 2)
                     }
                     .padding(.top, 6)
                 }
@@ -143,8 +148,11 @@ private struct UnwatchedSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    /// The direct URL scheme for adding a video to Unwatched's queue.
-    private let unwatchedTargetURL = "unwatched://queue?url="
+    /// Adds video to the end of Unwatched's queue.
+    private let unwatchedEndOfQueue = "unwatched://queue?url={url}"
+
+    /// Adds video to the top of Unwatched's queue (plays next).
+    private let unwatchedTopOfQueue = "unwatched://queue?url={url}&next=true"
 
     var body: some View {
         NavigationStack {
@@ -154,13 +162,26 @@ private struct UnwatchedSheet: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
+                Section {
+                    Text("The **&next=true** parameter adds the video to the top of Unwatched's queue so it plays next, instead of at the end.")
+                        .fixedSize(horizontal: false, vertical: true)
+                } header: {
+                    Text("Queue position")
+                }
+
                 Section("Setup") {
-                    // Writes the Unwatched target URL and closes the sheet in one tap.
                     Button {
-                        targetURL = unwatchedTargetURL
+                        targetURL = unwatchedEndOfQueue
                         dismiss()
                     } label: {
-                        Label("Use Unwatched as target", systemImage: "checkmark.circle")
+                        Label("Add to end of queue", systemImage: "text.line.last.and.arrowtriangle.forward")
+                    }
+
+                    Button {
+                        targetURL = unwatchedTopOfQueue
+                        dismiss()
+                    } label: {
+                        Label("Add to top of queue (play next)", systemImage: "text.line.first.and.arrowtriangle.forward")
                     }
                 }
 

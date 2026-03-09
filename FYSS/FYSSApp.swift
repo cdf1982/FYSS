@@ -64,7 +64,15 @@ class URLHandler {
         allowedCharacters.remove(charactersIn: "&=+#")
         let encodedPayload = payload.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? payload
 
-        var urlString = targetBase + encodedPayload
+        // If the target URL contains the {url} placeholder, substitute it with the encoded payload.
+        // Otherwise fall back to the legacy behaviour of appending the payload at the end,
+        // so that existing configurations without the placeholder continue to work.
+        var urlString: String
+        if targetBase.contains("{url}") {
+            urlString = targetBase.replacingOccurrences(of: "{url}", with: encodedPayload)
+        } else {
+            urlString = targetBase + encodedPayload
+        }
 
         // When "Return to YouTube" is enabled, switch to Shortcuts' x-callback-url scheme
         // and append x-success=youtube:// so the Shortcuts app reopens YouTube on completion.
