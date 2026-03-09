@@ -23,6 +23,14 @@ struct ContentView: View {
     /// Persisted via `UserDefaults` under the key `targetURL`.
     @AppStorage("targetURL") private var targetURL: String = "unwatched://queue?url="
 
+    /// When true, the forwarding URL is constructed using Shortcuts' x-callback-url scheme
+    /// so that the Shortcuts app reopens YouTube after the shortcut completes.
+    /// Persisted via `UserDefaults` under the key `returnToYouTube`.
+    @AppStorage("returnToYouTube") private var returnToYouTube: Bool = false
+
+    /// Controls visibility of the Unwatched setup sheet.
+    @State private var showUnwatchedSheet = false
+
     /// Controls visibility of the intercepted-scheme info sheet.
     @State private var showSchemeInfoSheet = false
 
@@ -90,8 +98,18 @@ struct ContentView: View {
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
                     #endif
+
+                    Toggle("Return to YouTube after forwarding", isOn: $returnToYouTube)
                 } header: {
                     Label("Target URL", systemImage: "arrow.turn.up.right")
+                } footer: {
+                    Button {
+                        showUnwatchedSheet = true
+                    } label: {
+                        Text("Show me how to use FYSS with Unwatched")
+                            .font(.footnote)
+                    }
+                    .padding(.top, 6)
                 }
 
                 // MARK: Last activity
@@ -106,8 +124,62 @@ struct ContentView: View {
             }
             .navigationTitle(horizontalSizeClass == .compact ? "FYSS 🤬" : "F🤬🤬k YouTube Share Sheet")
         }
+        .sheet(isPresented: $showUnwatchedSheet) {
+            UnwatchedSheet(targetURL: $targetURL)
+        }
         .sheet(isPresented: $showSchemeInfoSheet) {
             SchemeInfoSheet(scheme: interceptedScheme)
+        }
+    }
+}
+
+// MARK: - Unwatched sheet
+
+/// Sheet explaining how to use FYSS with Unwatched, with a one-tap setup button.
+private struct UnwatchedSheet: View {
+
+    /// Binding to the parent's `targetURL` so the setup button can write the Unwatched URL directly.
+    @Binding var targetURL: String
+
+    @Environment(\.dismiss) private var dismiss
+
+    /// The direct URL scheme for adding a video to Unwatched's queue.
+    private let unwatchedTargetURL = "unwatched://queue?url="
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    Text("Unwatched is a native iOS and visionOS YouTube client. FYSS can send video links directly to Unwatched using its built-in URL scheme.")
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Section("Setup") {
+                    // Writes the Unwatched target URL and closes the sheet in one tap.
+                    Button {
+                        targetURL = unwatchedTargetURL
+                        dismiss()
+                    } label: {
+                        Label("Use Unwatched as target", systemImage: "checkmark.circle")
+                    }
+                }
+
+                Section {
+                    Text("FYSS is not affiliated with Unwatched!")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .listRowBackground(Color.clear)
+                }
+            }
+            .navigationTitle("FYSS with Unwatched")
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
         }
     }
 }
