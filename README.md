@@ -20,24 +20,37 @@ By registering itself as a handler for `tg://`, FYSS intercepts YouTube's share 
 
 [Unwatched](https://github.com/fer0n/Unwatched) is a native iOS and visionOS YouTube client. It's great. It also has nothing to do with this, this is me hating YT for their b.s. share sheet. FYSS was originally built to feed videos to Unwatched.
 
-The currently recommended setup uses an Apple Shortcut as the bridge _(I need to find the time to open a P.R. for a direct URL scheme for Unwatched, which currently has one to play but not one for just adding to the queue... but this works fine for now)_:
+Unwatched supports a direct URL scheme for adding videos to the queue — no Shortcut required:
 
-1. Install the **[Add to Unwatched](https://www.icloud.com/shortcuts/4a3eef0ca74f4b649289570097a59ee4)** shortcut
-2. Open FYSS and tap **Show me how to use FYSS with Unwatched** to configure the target URL automatically
+```
+unwatched://queue?url={url}
+```
 
-Enable **Return to YouTube after forwarding** to automatically switch back to YouTube once the shortcut completes. FYSS uses Shortcuts' `x-callback-url` mechanism for this.
+To add the video to the top of the queue instead of the end, append `&next=true`:
+
+```
+unwatched://queue?url={url}&next=true
+```
+
+Open FYSS and tap **Show me how to use FYSS with Unwatched** to configure either option automatically in one tap.
 
 Again, FYSS is not affiliated with Unwatched.
 
 ## Using FYSS with any other app
 
-Set the target URL to any scheme that accepts a URL as a trailing parameter:
+Set the target URL using `{url}` as a placeholder for the video link:
 
 ```
-myapp://open?url=
+myapp://open?url={url}
 ```
 
-FYSS appends the percent-encoded YouTube URL and opens the result.
+FYSS replaces `{url}` with the percent-encoded YouTube URL and opens the result. You can append any extra parameters after the placeholder:
+
+```
+myapp://open?url={url}&autoplay=true
+```
+
+If the target URL contains no `{url}` placeholder, FYSS falls back to appending the link at the end (legacy behaviour, for backwards compatibility).
 
 ## What if I have Telegram installed?
 
