@@ -21,15 +21,7 @@ struct ContentView: View {
 
     /// The base URL to which the extracted YouTube link is appended before opening.
     /// Persisted via `UserDefaults` under the key `targetURL`.
-    @AppStorage("targetURL") private var targetURL: String = ""
-
-    /// When true, the forwarding URL is constructed using Shortcuts' x-callback-url scheme
-    /// so that the Shortcuts app reopens YouTube after the shortcut completes.
-    /// Persisted via `UserDefaults` under the key `returnToYouTube`.
-    @AppStorage("returnToYouTube") private var returnToYouTube: Bool = false
-
-    /// Controls visibility of the Unwatched setup sheet.
-    @State private var showUnwatchedSheet = false
+    @AppStorage("targetURL") private var targetURL: String = "unwatched://queue?url="
 
     /// Controls visibility of the intercepted-scheme info sheet.
     @State private var showSchemeInfoSheet = false
@@ -88,7 +80,7 @@ struct ContentView: View {
                 Section {
                     // axis: .vertical allows the field to grow to multiple lines on narrow screens.
                     TextField(
-                        "e.g. shortcuts://run-shortcut?name=MyShortcut&input=",
+                        "e.g. unwatched://queue?url=",
                         text: $targetURL,
                         axis: .vertical
                     )
@@ -98,18 +90,8 @@ struct ContentView: View {
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
                     #endif
-
-                    Toggle("Return to YouTube after forwarding", isOn: $returnToYouTube)
                 } header: {
                     Label("Target URL", systemImage: "arrow.turn.up.right")
-                } footer: {
-                    Button {
-                        showUnwatchedSheet = true
-                    } label: {
-                        Text("Show me how to use FYSS with Unwatched")
-                            .font(.footnote)
-                    }
-                    .padding(.top, 6)
                 }
 
                 // MARK: Last activity
@@ -124,70 +106,8 @@ struct ContentView: View {
             }
             .navigationTitle(horizontalSizeClass == .compact ? "FYSS 🤬" : "F🤬🤬k YouTube Share Sheet")
         }
-        .sheet(isPresented: $showUnwatchedSheet) {
-            UnwatchedSheet(targetURL: $targetURL)
-        }
         .sheet(isPresented: $showSchemeInfoSheet) {
             SchemeInfoSheet(scheme: interceptedScheme)
-        }
-    }
-}
-
-// MARK: - Unwatched sheet
-
-/// Sheet explaining how to use FYSS with Unwatched, with a one-tap setup button.
-private struct UnwatchedSheet: View {
-
-    /// Binding to the parent's `targetURL` so the setup button can write the Unwatched URL directly.
-    @Binding var targetURL: String
-
-    @Environment(\.dismiss) private var dismiss
-    
-    /// iCloud link to the Add to Unwatched Apple Shortcut.
-    private let shortcutURL = URL(string: "https://www.icloud.com/shortcuts/4a3eef0ca74f4b649289570097a59ee4")!
-
-    /// The Shortcuts target URL for the Add to Unwatched shortcut.
-    private let unwatchedTargetURL = "shortcuts://run-shortcut?name=Add%20To%20Unwatched&input="
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    Text("Unwatched is a native iOS and visionOS YouTube client. To send links from FYSS to Unwatched, you need an Apple Shortcut that accepts a URL and adds it to Unwatched's queue.")
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Section("Setup") {
-                    
-                    Link(destination: shortcutURL) {
-                        Label("Get the Add to Unwatched shortcut", systemImage: "arrow.down.circle")
-                    }
-                    
-                    // Writes the Unwatched target URL and closes the sheet in one tap.
-                    Button {
-                        targetURL = unwatchedTargetURL
-                        dismiss()
-                    } label: {
-                        Label("Use Unwatched as target", systemImage: "checkmark.circle")
-                    }
-                }
-
-                Section {
-                    Text("FYSS is not affiliated with Unwatched!")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .listRowBackground(Color.clear)
-                }
-            }
-            .navigationTitle("FYSS with Unwatched")
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                }
-            }
         }
     }
 }

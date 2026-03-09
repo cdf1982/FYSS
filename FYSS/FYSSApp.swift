@@ -45,7 +45,6 @@ class URLHandler {
         lastExtractedURL = extractedPayload ?? ""
 
         let targetBase = (UserDefaults.standard.string(forKey: "targetURL") ?? "").trimmingCharacters(in: .whitespaces)
-        let returnToYouTube = UserDefaults.standard.bool(forKey: "returnToYouTube")
 
         guard !targetBase.isEmpty else {
             lastForwardResult = "Error: no target URL configured."
@@ -64,20 +63,7 @@ class URLHandler {
         allowedCharacters.remove(charactersIn: "&=+#")
         let encodedPayload = payload.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? payload
 
-        var urlString = targetBase + encodedPayload
-
-        // When "Return to YouTube" is enabled, switch to Shortcuts' x-callback-url scheme
-        // and append x-success=youtube:// so the Shortcuts app reopens YouTube on completion.
-        // Note: this transformation is only meaningful when the target is a Shortcuts URL
-        // (shortcuts://run-shortcut?...). For other targets, only the x-success parameter is
-        // appended, which may or may not have any effect depending on the target app.
-        if returnToYouTube {
-            urlString = urlString.replacingOccurrences(
-                of: "shortcuts://run-shortcut?",
-                with: "shortcuts://x-callback-url/run-shortcut?"
-            )
-            urlString += "&x-success=youtube%3A%2F%2F"
-        }
+        let urlString = targetBase + encodedPayload
 
         guard let targetURL = URL(string: urlString) else {
             lastForwardResult = "Error: could not construct target URL."
