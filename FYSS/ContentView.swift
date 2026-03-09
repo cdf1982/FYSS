@@ -169,6 +169,13 @@ private struct UnwatchedSheet: View {
                     Text("Queue position")
                 }
 
+                Section {
+                    Text("Enable **Return to YouTube after forwarding** in the main screen. FYSS will append x-success=youtube:// to the target URL, and any app that supports the x-callback-url convention will reopen YouTube automatically.")
+                        .fixedSize(horizontal: false, vertical: true)
+                } header: {
+                    Text("Return to YouTube")
+                }
+
                 Section("Setup") {
                     Button {
                         targetURL = unwatchedEndOfQueue

@@ -34,6 +34,10 @@ unwatched://queue?url={url}&next=true
 
 Open FYSS and tap **Show me how to use FYSS with Unwatched** to configure either option automatically in one tap.
 
+### Returning to YouTube after queuing
+
+Enable the **Return to YouTube after forwarding** toggle in FYSS. When the toggle is on, FYSS appends `x-success=youtube://` to the target URL before opening it. Any app that supports the x-callback-url convention will reopen YouTube automatically after handling the link. Unwatched supports this as of version 1.6.
+
 Again, FYSS is not affiliated with Unwatched.
 
 ## Using FYSS with any other app
