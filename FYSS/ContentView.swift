@@ -34,6 +34,9 @@ struct ContentView: View {
     /// Controls visibility of the intercepted-scheme info sheet.
     @State private var showSchemeInfoSheet = false
 
+    /// Tracks keyboard focus on the target URL field so Return can dismiss it.
+    @FocusState private var isTargetURLFocused: Bool
+
     /// The first non-fyss URL scheme registered in Info.plist — the scheme FYSS intercepts.
     ///
     /// Read at runtime from `CFBundleURLTypes` so that it stays accurate if the user changes
@@ -94,6 +97,8 @@ struct ContentView: View {
                     )
                     .autocorrectionDisabled()
                     .font(.system(.body, design: .monospaced))
+                    .focused($isTargetURLFocused)
+                    .onSubmit { isTargetURLFocused = false }
                     #if os(iOS)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
@@ -127,6 +132,7 @@ struct ContentView: View {
                     Label("Last Activity", systemImage: "clock")
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle(horizontalSizeClass == .compact ? "FYSS 🤬" : "F🤬🤬k YouTube Share Sheet")
         }
         .sheet(isPresented: $showUnwatchedSheet) {
